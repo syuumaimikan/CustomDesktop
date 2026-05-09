@@ -1,1 +1,85 @@
-
+:root {
+  --bg-dark: #0b0e14;
+  --bg-panel: #141721;
+  --bg-header: #1a1d2b;
+  --border: #2d3142;
+  --accent: #4a9eff;
+  --text: #ced4da;
+}
+#root,
+body,
+html {
+  background-color: transparent !important;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
+  color: var(--text);
+  font-family: sans-serif;
+}
+.editor-header {
+  height: 50px;
+  background: var(--bg-header);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border);
+  justify-content: space-between;
+}
+.tab-btn {
+  padding: 8px 20px;
+  background: transparent;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 4px;
+}
+.tab-btn.active {
+  color: white;
+  background: var(--accent);
+}
+.side-panel {
+  background: var(--bg-panel);
+  display: flex;
+  flex-direction: column;
+}
+.panel-header {
+  padding: 10px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #666;
+  border-bottom: 1px solid var(--border);
+  text-transform: uppercase;
+}
+.layer-item {
+  padding: 10px 15px;
+  font-size: 13px;
+  cursor: pointer;
+  border-bottom: 1px solid #1e212b;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.layer-item.active {
+  background: #2d3142;
+  color: var(--accent);
+  border-left: 3px solid var(--accent);
+}
+.node-btn {
+  padding: 8px;
+  background: #2d3142;
+  border: 1px solid #444;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+}
+.key-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  position: absolute;
+  transform: translate(-4px, 0);
+}
