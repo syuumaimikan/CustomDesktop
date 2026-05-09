@@ -42,7 +42,7 @@ export default function LayoutManager({ data, onChange }: any) {
         ))}
         {activeGroup && (
           <div className="prop-group" style={{padding:'15px', borderTop:'1px solid #333'}}>
-            {['x','y','w','h'].map(p=>(<div key={p} className="prop-item"><label>{p.toUpperCase()}</label><input type="number" value={activeGroup.placement[p]} onChange={e=>updatePos(activeGroup.id, p, +e.target.value)} style={{width:'100%',background:'#000',color:'#fff',border:'1px solid #333'}} /></div>))}
+            {['x','y','w','h'].map(p=>(<div key={p} className="prop-item"><label>{p.toUpperCase()}</label><input type="number" value={activeGroup.placement[p]} onChange={e=>updatePos(activeGroup.id, p, +e.target.value)} style={{width:'80px'}} /></div>))}
           </div>
         )}
       </aside>
@@ -50,16 +50,22 @@ export default function LayoutManager({ data, onChange }: any) {
         onMouseMove={(e)=>{
           if(!isDragging || !data.activeGroupId) return;
           const rect = e.currentTarget.getBoundingClientRect();
-          updatePos(data.activeGroupId, 'x', ((e.clientX-rect.left)/scale)-dragOffset.x);
-          updatePos(data.activeGroupId, 'y', ((e.clientY-rect.top)/scale)-dragOffset.y);
+          const newX = (e.clientX - rect.left) / scale - dragOffset.x;
+          const newY = (e.clientY - rect.top) / scale - dragOffset.y;
+          updatePos(data.activeGroupId, 'x', newX);
+          updatePos(data.activeGroupId, 'y', newY);
         }} onMouseUp={()=>setIsDragging(false)}>
         <div className="virtual-screen" style={{ width: 1920*scale, height: 1080*scale, border: '2px solid #444', position: 'relative', background:'#0b0e14' }}>
           {data.groups.map((g: any) => (
             <div key={g.id} onMouseDown={(e)=>{
-              e.stopPropagation(); onChange({...data, activeGroupId: g.id}); setIsDragging(true);
-              const rect = e.currentTarget.parentElement!.getBoundingClientRect();
-              setDragOffset({ x: ((e.clientX-rect.left)/scale)-g.placement.x, y: ((e.clientY-rect.top)/scale)-g.placement.y });
-            }} style={{ position:'absolute', left: g.placement.x*scale, top: g.placement.y*scale, width: g.placement.w*scale, height: g.placement.h*scale, border: g.id === data.activeGroupId ? '2px solid #4a9eff' : '1px solid #666', background: 'rgba(74,158,255,0.1)', cursor:'move', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'10px' }}>{g.name}</div>
+              e.stopPropagation();
+              onChange({...data, activeGroupId: g.id});
+              setIsDragging(true);
+              // dragOffsetは、マウス位置（スケール後）からウィジェット位置を引いた値
+              const offsetX = ((e.clientX - (e.currentTarget.parentElement?.getBoundingClientRect().left || 0)) / scale) - g.placement.x;
+              const offsetY = ((e.clientY - (e.currentTarget.parentElement?.getBoundingClientRect().top || 0)) / scale) - g.placement.y;
+              setDragOffset({ x: offsetX, y: offsetY });
+            }} style={{ position:'absolute', left: g.placement.x*scale, top: g.placement.y*scale, width: g.placement.w*scale, height: g.placement.h*scale, border: g.id === data.activeGroupId ? '2px solid #4a9eff' : '1px solid #444', background: g.ghost ? 'rgba(100,100,100,0.3)' : 'rgba(74,158,255,0.1)', cursor: 'grab', boxSizing: 'border-box' }}></div>
           ))}
         </div>
       </main>
