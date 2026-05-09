@@ -19,7 +19,7 @@ function App() {
     return (
       <div className="widget-root" style={{ width: '100%', height: '100%', position:'relative' }}>
         {shapes.map((s: any) => (
-          <div key={s.id} style={{ position:'absolute', left: s.x, top: s.y, width: s.w, height: s.h, backgroundColor: s.color, opacity: s.opacity, transform: `translate(-50%, -50%) rotate(${s.rotation}deg)`, borderRadius: s.type === 'circle' ? '50%' : '4px' }} />
+          <div key={s.id} style={{ position:'absolute', left: s.x, top: s.y, width: s.w, height: s.h, backgroundColor: s.color, opacity: s.opacity, transform: `translate(-50%, -50%) rotate(${s.rotation}deg)`, borderRadius: s.type === 'circle' ? '50%' : '0px' }}></div>
         ))}
       </div>
     );
