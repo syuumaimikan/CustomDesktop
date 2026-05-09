@@ -57,7 +57,7 @@ export default function WidgetCreator({ data, onChange }: any) {
   const addShape = (type: 'rect' | 'circle') => {
     if (!data.activeGroupId) return;
     const id = `shape-${Date.now()}`;
-    const newShape = { id, type, name: `${type}-${shapes.length+1}`, color:'#ffffff', tracks:{ x:[{time:0,value:50}], y:[{time:0,value:50}], w:[{time:0,value:100}], h:[{time:0,value:100}], opacity:[{time:0,value:1}], rotation:[{time:0,value:0}] }};
+    const newShape = { id, type, name: `${type}-${shapes.length+1}`, color:'#ffffff', tracks:{ x:[{time:0,value:50}], y:[{time:0,value:50}], w:[{time:0,value:100}], h:[{time:0,value:100}], opacity:[{time:0,value:1}], rotation:[{time:0,value:0}] } };
     onChange({...data, groups: data.groups.map((g:any)=>g.id===data.activeGroupId?{...g, shapes:[...g.shapes, newShape]}:g)});
     setSelectedId(id);
   };
@@ -85,10 +85,14 @@ export default function WidgetCreator({ data, onChange }: any) {
           <div className="canvas-view" style={{width:activeGroup.placement.w, height:activeGroup.placement.h, background:'#1a1d2b', position:'relative', overflow:'hidden'}}>
             {shapes.map((s:any)=>(
               <div key={s.id} onMouseDown={(e)=>{
-                e.stopPropagation(); setSelectedId(s.id); setIsDragging(true);
+                e.stopPropagation();
+                setSelectedId(s.id);
+                setIsDragging(true);
                 const rect = e.currentTarget.parentElement!.getBoundingClientRect();
-                setDragOffset({ x: (e.clientX-rect.left)-evaluate(s.tracks.x,currentTime), y: (e.clientY-rect.top)-evaluate(s.tracks.y,currentTime) });
-              }} style={{position:'absolute', left:evaluate(s.tracks.x,currentTime), top:evaluate(s.tracks.y,currentTime), width:evaluate(s.tracks.w,currentTime), height:evaluate(s.tracks.h,currentTime), backgroundColor:s.color, opacity:evaluate(s.tracks.opacity,currentTime), transform:`translate(-50%,-50%) rotate(${evaluate(s.tracks.rotation,currentTime)}deg)`, borderRadius:s.type==='circle'?'50%':'4px', border:s.id===selectedId?'2px solid #4a9eff':'none', cursor:'move'}} />
+                const shapeX = evaluate(s.tracks.x, currentTime);
+                const shapeY = evaluate(s.tracks.y, currentTime);
+                setDragOffset({ x: (e.clientX-rect.left)-shapeX, y: (e.clientY-rect.top)-shapeY });
+              }} style={{position:'absolute', left:evaluate(s.tracks.x,currentTime), top:evaluate(s.tracks.y,currentTime), width:evaluate(s.tracks.w,currentTime), height:evaluate(s.tracks.h,currentTime), backgroundColor:s.color, opacity:evaluate(s.tracks.opacity,currentTime), transform:`rotate(${evaluate(s.tracks.rotation,currentTime)}deg)`, borderRadius: s.type==='circle'?'50%':'0px', cursor:'grab' }}></div>
             ))}
           </div>
         </main>
@@ -100,8 +104,8 @@ export default function WidgetCreator({ data, onChange }: any) {
                  <div key={p} className="prop-item">
                    <label>{p.toUpperCase()}</label>
                    <div style={{display:'flex',gap:'5px'}}>
-                     <input type="range" min={p==='rotation'?0:0} max={p==='rotation'?360:(p==='opacity'?1:800)} step={p==='opacity'?0.01:1} value={evaluate(selectedShape.tracks[p],currentTime)} onChange={(e)=>updateProp(selectedId!,p,+e.target.value)} style={{flex:1}} />
-                     <input type="number" value={evaluate(selectedShape.tracks[p],currentTime).toFixed(p==='opacity'?2:0)} onChange={(e)=>updateProp(selectedId!,p,+e.target.value)} style={{width:'50px',background:'#000',border:'1px solid #333',color:'#fff'}} />
+                     <input type="range" min={p==='rotation'?0:0} max={p==='rotation'?360:(p==='opacity'?1:800)} step={p==='opacity'?0.01:1} value={evaluate(selectedShape.tracks[p],currentTime)} onChange={(e)=>updateProp(selectedId!,p,+e.target.value)} />
+                     <input type="number" value={evaluate(selectedShape.tracks[p],currentTime).toFixed(p==='opacity'?2:0)} onChange={(e)=>updateProp(selectedId!,p,+e.target.value)} style={{width:'60px'}} />
                    </div>
                  </div>
                ))}
@@ -117,7 +121,7 @@ export default function WidgetCreator({ data, onChange }: any) {
         </div>
         <div className="timeline-content" ref={timelineRef} style={{position:'relative', flex:1, cursor:'ew-resize'}} onClick={(e)=>setCurrentTime((e.nativeEvent.offsetX)/100)}>
           <div className="playhead" style={{left:currentTime*100, position:'absolute', top:0, bottom:0, width:'2px', background:'red', zIndex:10}} />
-          {shapes.map((s:any)=>(<div key={s.id} style={{height:'20px',borderBottom:'1px solid #222',position:'relative'}}>{Object.values(s.tracks).flatMap((t:any)=>t).map((k:any,i)=>(<div key={i} className="key-dot" style={{left:k.time*100, position:'absolute', top:'6px', width:'8px', height:'8px', background:s.id===selectedId?'#4a9eff':'#444', borderRadius:'50%'}} />))}</div>))}
+          {shapes.map((s:any)=>(<div key={s.id} style={{height:'20px',borderBottom:'1px solid #222',position:'relative'}}>{Object.values(s.tracks).flatMap((t:any)=>t).map((k:any,i)=>(<div key={i} style={{position:'absolute', left:k.time*100, bottom:'2px', width:'4px', height:'4px', backgroundColor:'#4a9eff', borderRadius:'50%'}} title={`${k.time.toFixed(2)}s: ${k.value}`} />))}</div>))}
         </div>
       </footer>
     </div>
